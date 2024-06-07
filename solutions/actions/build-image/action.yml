@@ -1,4 +1,3 @@
-
 name: Build image
 description: "Build and push an image to ghcr"
 inputs:
@@ -10,14 +9,14 @@ inputs:
     default: "true"
     required: false
 outputs:
-    imageName:
-      description: "Name of built image"
-      value: ${{ inputs.push && steps.set-output.outputs.imageName || null }}
-      #value: ${{ steps.set-output.outputs.imageName }}
-    digest:
-      description: "Digest of built image"
-      value: ${{ inputs.push && steps.set-output.outputs.digest || null }}
-      #value: ${{ steps.set-output.outputs.digest }}
+  imageName:
+    description: "Name of built image"
+    value: ${{ inputs.push && steps.set-output.outputs.imageName || null }}
+    #value: ${{ steps.set-output.outputs.imageName }}
+  digest:
+    description: "Digest of built image"
+    value: ${{ inputs.push && steps.set-output.outputs.digest || null }}
+    #value: ${{ steps.set-output.outputs.digest }}
 runs:
   using: "composite"
   steps:
@@ -35,6 +34,13 @@ runs:
       shell: bash
       run: |
         echo "DOCKER_IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
 
     - name: Build and push Docker image
       id: build-push
